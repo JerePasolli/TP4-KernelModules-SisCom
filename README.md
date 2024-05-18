@@ -3,7 +3,7 @@
 ## Desafío 1 
 
 - ¿Qué es checkinstall y para qué sirve?
-- ¿Se animan a usarlo para empaquetar un hello world ? 
+- ¿Se animan a usarlo para empaquetar un hello world? 
 - Revisar la bibliografía para impulsar acciones que permitan mejorar la seguridad del kernel, concretamente: evitando cargar módulos que no estén firmados.
 
 ## Desafío 2
@@ -62,10 +62,67 @@ Para verlo mas claro por ejemplo las función de biblioteca llama a una o más l
 
 
 ## ¿Qué es checkinstall y para qué sirve?
-checkinstall  is  a program that monitors an installation procedure (such as make install, install.sh ), and creates a standard package for your distribution (currently deb, rpm and tgz packages are sup‐
-       ported) that you can install through your distribution's package management system (dpkg, rpm or installpkg).
+
+Checkinstall es un programa que monitorea un procedimiento de instalación (como make install, install.sh, etc) y crea un paquete estándar para una distribución de Linux (actualmente se soportan paquetes deb, rpm y tgz) que se puede instalar a través del sistema de gestión de paquetes de la distribución en cuestión (dpkg, rpm o installpkg).
+
+El principal beneficio de CheckInstall contra simplemente ejecutar make install es la habilidad de instalar y desinstalar el paquete del sistema usando el sistema de gestión de paquetes de la distribución de  Linux, además de poder instalar el paquete resultante en varias computadoras fácilmente.
+
+## ¿Se animan a usarlo para empaquetar un hello world? 
+
+Para probar la utilidad de checkinstall creamos un sencillo "Hello world" en C:
+
+```c
+#include <stdio.h>
+
+int main() 
+{
+    printf("Hello, World!\n");
+    return 0;
+}
 ```
+
+Luego procedimos a crear el Makefile correspondiente, generando dentro de este la instrucción "install", que luego utilizará Checkinstall para generar el paquete a través del Makefile:
+
+```makefile
+TARGET = hello_world
+SRCS = hello_world.c
+CC = gcc
+CFLAGS = -Wall -Werror
+
+all: $(TARGET)
+
+$(TARGET): $(SRCS)
+    $(CC) $(CFLAGS) -o $(TARGET) $(SRCS)
+
+install: $(TARGET)
+    install -m 0755 $(TARGET) /usr/local/bin/
+
+clean:
+    rm -f $(TARGET)
 ```
-asdasd
-adas
-'''
+Una vez creado el makefile, simplemente resta ejecutar Checkinstall para generar el paquete. En vez de utilizar ```make install``` como haríamos usualmente, ejecutamos ```checkinstall```. Esto utilizará la instrucción "install" dentro del Makefile para generar el paquete (.deb en este caso).
+Una vez ejecutado este comando, se nos permite modificar diferentes atributos del paquete a crear, tales como su nombre, descripción, versión, autor, etc, de la siguiente manera:
+
+![Ejecución de checkinstall](./img/img1.png)
+![Ejecución de checkinstall](./img/img2.png)
+
+Una vez terminado este proceso, obtenemos el paquete .deb de nuestro programa:
+
+![Paquete .deb obtenido](./img/img3.png)
+
+Y al abrirlo podremos instalarlo a través del sistema de gestión de paquetes (interfaz gráfica):
+
+![Instalación del paquete .deb mediante interfaz gráfica](./img/img4.png)
+
+O bien podemos instalarlo mediante la terminal con el comando ```sudo dpkg -i tp4-kernelmodules_1.0-1_amd64.deb```
+
+## Revisar la bibliografía para impulsar acciones que permitan mejorar la seguridad del kernel, concretamente: evitando cargar módulos que no estén firmados
+
+En primer lugar, para evitar la carga de módulos no firmados en el kernel se debe habilitar el arranque seguro (secure boot) desde la BIOS o UEFI:
+
+![Activación de arranque seguro](./img/img5.webp)
+
+De esta manera al intentar cargar un módulo que no esté firmado el SO nos lo impedirá:
+
+
+

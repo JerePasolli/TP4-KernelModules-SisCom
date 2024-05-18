@@ -45,8 +45,16 @@
 # Kernel Module Compile Results
 *.mod*
 *.cmd
+*.ko
 .tmp_versions/
 modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+
+# Package files
+*.deb
+
+doc-pak/
+description-pak
+hello_world
