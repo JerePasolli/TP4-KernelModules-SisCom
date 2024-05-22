@@ -58,3 +58,7 @@ dkms.conf
 doc-pak/
 description-pak
 hello_world
+
+#ssh keys
+my_signing_key_pub.der
+my_signing_key.priv
