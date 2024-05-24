@@ -266,6 +266,13 @@ Ejemplos: Teclados, ratones, puertos serie, y consolas.
 Identificación: Generalmente tienen nombres como tty0, ttyS0, random, null, etc.
 Uso: Estos dispositivos son utilizados para operaciones de entrada/salida de baja latencia y permiten el acceso secuencial a los datos.
 
+Podemos saber si un dispositivo es de cada tipo ejecutando el comando `ls -l`, y observando la primera letra de cada dispositivo listado: 
+- c -> character
+- b -> block
+
+![Listado de dispositivos en /dev](./img/img13.png)
+![Listado de dispositivos en /dev](./img/img14.png)
+
 #### Dispositivos Comunes en /dev
 
 - /dev/null: Un dispositivo especial que descarta cualquier dato escrito en él. Leer desde /dev/null siempre devuelve un EOF (End Of File).
@@ -277,3 +284,46 @@ Uso: Estos dispositivos son utilizados para operaciones de entrada/salida de baj
 - /dev/cdrom, /dev/dvd: Representan unidades de CD/DVD.
 
 ## Preguntas finales
+
+Ejecutamos el paso a paso para cargar y descargar el módulo de ejemplo del repositorio en el kernel, de la siguiente manera:
+
+```bash
+$ cd part1/module
+$ make
+$ sudo insmod mimodulo.ko
+$ sudo dmesg
+$ lsmod | grep mod
+$ sudo rmmod mimodulo
+$ sudo dmesg
+$ lsmod | grep mod
+$ modinfo mimodulo.ko
+$ modinfo /lib/modules/$(uname -r)/kernel/crypto/des_generic.ko
+```
+En las siguientes imágenes se observan los resultados de los comandos:
+
+![Resultado del comando insmod](./img/img15.png)
+
+Extracto del comando `sudo dmesg`:
+
+![Resultado del comando dmesg luego de cargar el módulo](./img/img16.png)
+![Resultado del comando lsmod luego de cargar el módulo](./img/img17.png)
+
+Extracto del comando `sudo dmesg` luego de remover el módulo:
+
+![Resultado del comando dmesg luego de remover el módulo](./img/img18.png)
+
+Y los respectivos comandos `modinfo`:
+
+![Resultado del comando modinfo](./img/img19.png)
+![Resultado del comando modinfo](./img/img20.png)
+
+### ¿Qué diferencias se pueden observar entre los dos modinfo?
+
+El módulo des_generic.ko proporciona una implementación del algoritmo DES (Data Encryption Standard) para ser utilizado dentro del kernel de Linux. Esto permite que el cifrado DES sea utilizado por otras partes del kernel, como el subsistema de criptografía (Crypto API) y puede ser aprovechado por aplicaciones que necesitan realizar operaciones criptográficas a nivel del kernel. Por otro lado, mimodulo.ko es un simple ejemplo que escribe un mensaje indicando si fue cargado/descargado del kernel.
+
+En primer lugar notamos que el módulo "des_generic.ko" posee varios alias asociados, lo que nos da distintas formas de accederlo en caso de necesitarlo. Además, contiene como dependencia la librería "libdes".
+
+La otra gran diferencia es que este módulo propio del kernel esta firmado, por lo que se puede considerar seguro, mientras que nuestro ejemplo no lo está. De igual manera, siguiendo el procedimiento ya mencionado se puede firmar de manera similar.
+
+### ¿Qué divers/modulos estan cargados en sus propias pc?
+
