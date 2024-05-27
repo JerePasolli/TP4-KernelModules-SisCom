@@ -1,4 +1,8 @@
 # TP4 - Kernel Modules - Sistemas de Computación 2024
+# Integrantes:
+- Nestor Jeremías Pasolli
+- Alex Agustín Hernando
+- Tomás Moyano
 
 ## Desafío 1 
 
