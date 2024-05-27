@@ -1,0 +1,107 @@
+Module                  Size  Used by
+rfcomm                 98304  4
+cmac                   12288  2
+algif_hash             12288  1
+algif_skcipher         12288  1
+af_alg                 32768  6 algif_hash,algif_skcipher
+bnep                   32768  2
+ccm                    20480  3
+snd_hda_codec_hdmi     94208  1
+snd_hda_codec_realtek   192512  1
+snd_hda_codec_generic   122880  1 snd_hda_codec_realtek
+ledtrig_audio          12288  1 snd_hda_codec_generic
+intel_rapl_msr         20480  0
+intel_rapl_common      40960  1 intel_rapl_msr
+x86_pkg_temp_thermal    20480  0
+intel_powerclamp       24576  0
+snd_usb_audio         450560  3
+snd_hda_intel          61440  3
+snd_intel_dspcfg       32768  1 snd_hda_intel
+coretemp               24576  0
+snd_usbmidi_lib        53248  1 snd_usb_audio
+snd_intel_sdw_acpi     16384  1 snd_intel_dspcfg
+binfmt_misc            24576  1
+snd_ump                45056  1 snd_usb_audio
+snd_hda_codec         212992  4 snd_hda_codec_generic,snd_hda_codec_hdmi,snd_hda_intel,snd_hda_codec_realtek
+kvm_intel             487424  0
+snd_hda_core          147456  5 snd_hda_codec_generic,snd_hda_codec_hdmi,snd_hda_intel,snd_hda_codec,snd_hda_codec_realtek
+nls_iso8859_1          12288  1
+mc                     86016  1 snd_usb_audio
+snd_hwdep              20480  2 snd_usb_audio,snd_hda_codec
+kvm                  1409024  1 kvm_intel
+mei_hdcp               28672  0
+mei_pxp                16384  0
+snd_pcm               196608  6 snd_hda_codec_hdmi,snd_hda_intel,snd_usb_audio,snd_hda_codec,snd_hda_core
+ath9k                 253952  0
+snd_seq_midi           24576  0
+i915                 4157440  19
+snd_seq_midi_event     16384  1 snd_seq_midi
+irqbypass              12288  1 kvm
+ath9k_common           53248  1 ath9k
+crct10dif_pclmul       12288  1
+ath9k_hw              671744  2 ath9k_common,ath9k
+polyval_clmulni        12288  0
+polyval_generic        12288  1 polyval_clmulni
+snd_rawmidi            57344  3 snd_seq_midi,snd_usbmidi_lib,snd_ump
+ghash_clmulni_intel    16384  0
+cryptd                 24576  1 ghash_clmulni_intel
+ath3k                  20480  0
+sha256_ssse3           32768  0
+ath                    36864  3 ath9k_common,ath9k,ath9k_hw
+btusb                  73728  0
+drm_buddy              20480  1 i915
+sha1_ssse3             32768  0
+snd_seq               118784  3 snd_seq_midi,snd_seq_midi_event
+btrtl                  32768  1 btusb
+rapl                   20480  0
+mac80211             1720320  1 ath9k
+ttm                   110592  1 i915
+intel_cstate           20480  0
+btbcm                  24576  1 btusb
+btintel                53248  1 btusb
+drm_display_helper    241664  1 i915
+btmtk                  12288  1 btusb
+snd_seq_device         16384  4 snd_seq,snd_seq_midi,snd_ump,snd_rawmidi
+snd_timer              49152  2 snd_seq,snd_pcm
+bluetooth            1081344  35 btrtl,btmtk,btintel,btbcm,bnep,ath3k,btusb,rfcomm
+cec                    94208  2 drm_display_helper,i915
+ecdh_generic           16384  1 bluetooth
+rc_core                77824  1 cec
+serio_raw              20480  0
+input_leds             12288  0
+joydev                 32768  0
+ecc                    45056  1 ecdh_generic
+mei_me                 53248  2
+snd                   143360  26 snd_hda_codec_generic,snd_seq,snd_seq_device,snd_hda_codec_hdmi,snd_hwdep,snd_hda_intel,snd_usb_audio,snd_usbmidi_lib,snd_hda_codec,snd_hda_codec_realtek,snd_timer,snd_ump,snd_pcm,snd_rawmidi
+cfg80211             1323008  4 ath9k_common,ath9k,ath,mac80211
+drm_kms_helper        274432  2 drm_display_helper,i915
+libarc4                12288  1 mac80211
+soundcore              16384  1 snd
+i2c_algo_bit           16384  1 i915
+mei                   167936  5 mei_hdcp,mei_pxp,mei_me
+mac_hid                12288  0
+sch_fq_codel           24576  2
+msr                    12288  0
+parport_pc             53248  0
+ppdev                  24576  0
+lp                     28672  0
+parport                77824  3 parport_pc,lp,ppdev
+drm                   765952  12 drm_kms_helper,drm_display_helper,drm_buddy,i915,ttm
+efi_pstore             12288  0
+ip_tables              36864  0
+x_tables               69632  1 ip_tables
+autofs4                57344  2
+crc32_pclmul           12288  0
+psmouse               212992  0
+ahci                   49152  2
+r8169                 114688  0
+libahci                57344  1 ahci
+lpc_ich                32768  0
+xhci_pci               24576  0
+realtek                36864  1
+xhci_pci_renesas       20480  1 xhci_pci
+video                  73728  1 i915
+wmi                    40960  1 video
+hid_generic            12288  0
+usbhid                 77824  0
+hid                   180224  2 usbhid,hid_generic

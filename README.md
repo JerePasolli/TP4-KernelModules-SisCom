@@ -120,7 +120,7 @@ Una vez hechos estos pasos, ya es posible cargar el módulo firmado:
 
 Debe tener respuestas precisas a las siguientes preguntas y sentencias:
 
-### ¿ Cómo empiezan y terminan unos y otros (programas y módulos) ?
+### ¿Cómo empiezan y terminan unos y otros (programas y módulos)?
 
 Un programa generalmente comienza con la funcion `main()`, esto depende del lenguaje y de la implementacion, luego ejecuta una serie de instrucciones y termina despues de completarlas.
 
@@ -325,5 +325,140 @@ En primer lugar notamos que el módulo "des_generic.ko" posee varios alias asoci
 
 La otra gran diferencia es que este módulo propio del kernel esta firmado, por lo que se puede considerar seguro, mientras que nuestro ejemplo no lo está. De igual manera, siguiendo el procedimiento ya mencionado se puede firmar de manera similar.
 
-### ¿Qué divers/modulos estan cargados en sus propias pc?
+### ¿Qué divers/modulos estan cargados en sus propias pc? Analizar diferencias entre las PCs de cada integrante
 
+En los siguientes archivos se listan los módulos cargados en cada PC de los integrantes del grupo, obntenidos mediante el comando `lsmod`:
+
+- [Módulos en PC de Jeremías Pasolli (escritorio)](./txtFiles/lsmod_Jeremias_Original.txt)
+- [Módulos en PC de Agustín Hernando (notebook)](./txtFiles/lsmod_Agustin_Original.txt)
+- [Módulos en PC de Tomás Moyano (notebook)](./txtFiles/lsmod_Tomas_Original.txt)
+
+Mediante la utilización del comando `awt` filtramos la primera columna de los archivos, para obtener únicamente los nombres de los módulos. Luego los ordenamos alfabéticamente, para mayor precisión en el posterior paso, en el cual ejecutamos el comando `diff` entre los archivos.
+
+De esta manera, mediante el comando:
+```bash
+ $ awk 'NR==1 {next} {print $1}' lsmod_nombreIntegrannte_Original.txt > lsmod_nombreIntegrante_Clean.txt
+ ```
+
+filtramos la primer columna, obteniendo:
+
+- [Módulos en PC de Jeremías Pasolli (escritorio, filtrado)](./txtFiles/lsmod_Jeremias_Clean.txt)
+- [Módulos en PC de Agustín Hernando (notebook, filtrado)](./txtFiles/lsmod_Agustin_Clean.txt)
+- [Módulos en PC de Tomás Moyano (notebook, filtrado)](./txtFiles/lsmod_Tomas_Clean.txt)
+
+y luego, mediante:
+
+```bash
+sort lsmod_nombreIntegrante_Clean.txt > lsmod_nombreIntegrante_Sorted.txt
+```
+
+obtenemos los tres archivos filtrados y ordenados para mayor claridad:
+
+ - [Módulos en PC de Jeremías Pasolli (escritorio, filtrado y ordenado)](./txtFiles/lsmod_Jeremias_Sorted.txt)
+- [Módulos en PC de Agustín Hernando (notebook, filtrado y ordenado)](./txtFiles/lsmod_Agustin_Sorted.txt)
+- [Módulos en PC de Tomás Moyano (notebook, filtrado y ordenado)](./txtFiles/lsmod_Tomas_Sorted.txt)
+
+Finalmente ejecutamos el comando diff entre archivos para ver las diferencias. Se presentan archivos con las diferencias encontradas entre los módulos listados por cada PC:
+
+- [Diferencia entre PC de Jeremías Pasolli y Agustín Hernando](./txtFiles/diff_Agustin_Jeremias.txt)
+- [Diferencia entre PC de Jeremías Pasolli y Tomás Moyano](./txtFiles/diff_Tomas_Jeremias.txt)
+- [Diferencia entre PC de Agustín Hernando y Tomás Moyano](./txtFiles/diff_Tomas_Agustin.txt)
+
+Analizando los archivos con las diferencias logramos ver que hay muchas similitudes entre los módulos de las PCs. Sin embargo, y como era de esperarse, encontramos también diferencias en menor medida. Esto se debe a las diferencias de hardware entre las PCs, ya que vemos que las diferencias surgen en módulos encargados de controlar hardware que es muy diferente entre una PC y otra, como por ejemplo controladores de placas de video (nvidia vs amd), distintos módulos correspondientes al CPU de cada PC (diferentes arquitecturas de ), controladores de placas de audio, controladores de teclado/mouse, controladores de dispositivos de almacenamiento (SATA vs NVME), etc.
+
+### ¿Cuáles módulos no están cargados pero están disponibles? ¿Qué pasa cuando el driver de un dispositivo no está disponible?
+
+Para saber los módulos que tenemos disponibles para nuestro kernel ejecutamos el siguiente comando, buscando los archivos ".ko" en el directorio correspondiente a la versión del kernel.
+
+```bash
+find /lib/modules/$(uname -r)/kernel -type f -name '*.ko*'
+```
+Y para saber los módulos que efectivamente están cargados podemos utilizar `lsmod`.
+
+Mediante el siguiente script, disponible en el archivo [loaded_vs_available_modules.sh](./loaded_vs_available_modules.sh), podemos comparar la lista de módulos disponibles vs la de módulos cargados, obteniendo como impresión en pantalla los módulos disponibles pero no cargados:
+
+```bash
+# Obtener la lista de módulos cargados
+loaded_modules=$(lsmod | awk '{print $1}' | tail -n +2)
+
+# Obtener la lista de módulos disponibles
+available_modules=$(find /lib/modules/$(uname -r)/kernel -type f -name '*.ko*' | xargs -n 1 basename | sed 's/.ko.*//')
+
+# Comparar las dos listas y encontrar los módulos disponibles pero no cargados
+for module in $available_modules; do
+    if ! echo "$loaded_modules" | grep -qw "$module"; then
+        echo "$module"
+    fi
+done
+```
+
+Al observar la salida de este script, notamos que hay una gran cantidad de módulos disponibles pero no cargados en el kernel, de funcionalidades muy variadas. Esto es así ya que es justamente el objetivo de la modularidad del kernel, que le permite ser más flexible y agregar o quitar funcionalidades cuando sea necesario, cargando y descargando módulos respectivamente. Además, esto permite compatibilidad con una amplia cantidad de hardware de diferentes fabricantes, he aquí otra razón por la que muchos módulos no están cargados. El kernel se encarga automáticamente de cargar y descargar los módulos necesarios. También, de así desearlo, podemos hacerlo manualmente mediante la herramienta `udev`. Además, cargar todos los módulos al arrancar el sistema resultaría en un alto consumo de recursos de manera innecesaria, por lo que la carga/descarga dinámica es lo más eficiente para el sistema.
+
+### Correr hwinfo en una pc real con hw real y agregar la url de la información de hw en el reporte
+
+Este comando ofrece un reporte extenso y detallado sobre el hardware que está funcionando en una PC en el momento en el que se ejecuta. En el archivo [hw_info_pc.txt](./txtFiles/hw_info_pc.txt) se encuentra el reporte de hardware de una PC del grupo.
+
+### ¿Qué diferencia existe entre un módulo y un programa? 
+
+
+La diferencia entre un módulo del kernel de Linux y un programa común es principalmente la manera en que interactúan con el sistema.
+
+Los módulos del kernel están diseñados para extender la funcionalidad del kernel de Linux. Son utilizados para agregar soporte para hardware específico, sistemas de archivos, protocolos de red, y otras funcionalidades que deben operar a nivel del sistema. Proporcionan servicios esenciales y de bajo nivel, como el manejo de dispositivos, controladores de hardware, y funciones críticas del sistema que requieren acceso directo a los recursos del hardware. Además, operan en el espacio del kernel, lo que les permite tener acceso directo y sin restricciones a los recursos del hardware y a las estructuras internas del kernel. Debido a su alto nivel de acceso, errores o vulnerabilidades en los módulos del kernel pueden causar caídas del sistema, corrupción de datos, o brechas de seguridad.
+
+
+Por otro lado, los programas están diseñados para realizar tareas de usuario o aplicaciones específicas. Operan en el espacio de usuario y no interactúan directamente con el hardware. Utilizan servicios proporcionados por el kernel para realizar sus tareas. Operan en el espacio de usuario, que está separado del espacio del kernel. Esto protege al sistema de fallos potenciales y aumenta la seguridad.
+
+Otra diferencia importante ya mencionada en respuesta anteriores es que los módulos sólo pueden utilizar funciones externas que sean provistas por el kernel.
+
+### ¿Cómo puede ver una lista de las llamadas al sistema que realiza un simple helloworld en c?
+
+Para lograr esto podemos utilizar la herramienta `strace`, que intercepta y registra todas las llamadas al sistema que realiza un proceso particular. Al correr este comando con nuestro [hello_world](./hello_world.c), previamente compilado, obtenemos la siguiente salida:
+
+![Resultado del comando strace con programa hello_world](./img/img21.png)
+
+Donde podemos ver cómo un programa tan simple como este hace múltiples llamadas al sistema, tales como:
+
+- execve: Llama a execve para ejecutar el programa.
+- brk: Ajusta el límite del segmento de datos.
+- mmap: Mapea archivos o dispositivos en memoria.
+- access: Comprueba la existencia del archivo /etc/ld.so.preload.
+- openat: Abre archivos necesarios, como bibliotecas compartidas.
+- fstat: Obtiene el estado de un archivo.
+- write: Escribe "Hello, World!\n" en la salida estándar (descriptor de archivo 1).
+- exit_group: Finaliza el programa.
+
+### ¿Qué es un segmentation fault? como lo maneja el kernel y como lo hace un programa?
+
+Un segmentation fault (fallo de segmentación) es un tipo de error que ocurre cuando un programa intenta acceder a una memoria que no tiene permiso para acceder. Este acceso ilegal puede ser debido a diversas razones, como intentar leer o escribir en una dirección de memoria fuera del espacio de direcciones asignado al proceso, acceder a una memoria liberada, desreferenciar un puntero nulo, etc.
+
+#### ¿Cómo Maneja el Kernel un Segmentation Fault?
+
+Detección:
+
+El hardware de la CPU tiene mecanismos de protección de memoria que generan una excepción cuando se produce un acceso de memoria inválido.
+La Unidad de Gestión de Memoria (MMU) de la CPU detecta el acceso ilegal y genera una interrupción, señalando al kernel que se ha producido una violación de segmentación.
+
+Interrupción y Señalización:
+
+El kernel recibe la interrupción y determina que ha ocurrido un fallo de segmentación.
+El kernel envía una señal SIGSEGV (segmentation violation) al proceso que causó la violación de memoria.
+
+Terminación del Proceso:
+
+Si el proceso no maneja la señal SIGSEGV, el comportamiento predeterminado del kernel es terminar el proceso y generar un core dump (si está configurado para hacerlo). Un core dump es un volcado de la memoria del proceso en el momento del fallo, que puede ser útil para depuración.
+
+#### ¿Cómo Maneja un Programa un Segmentation Fault?
+
+Manejo de Señales:
+
+Un programa puede manejar la señal SIGSEGV que envía el kernel al detectar el fallo de segmentación, registrando un manejador de señales (signal handler), usando la función signal o sigaction en C.
+
+Depuración:
+
+Durante el desarrollo, un core dump generado por un segmentation fault puede ser analizado con herramientas como gdb (GNU Debugger) para determinar la causa del fallo.
+
+#### ¿Qué pasa si mi compañero con secure boot habilitado intenta cargar un módulo firmado por mi?
+
+En primera isntancia, si un compañero intenta cargar un módulo firmado por mí con secure boot habilitado en su PC, el kernel no le permitirá hacerlo, ya que su PC no cuenta con la llave pública correspondiente a la llave privada con la que yo firmé previamente el módulo.
+
+Para que él pueda cargarlo correctamente, primero debería agregar en su sistema mi llave pública. Una vez hecho esto, el kernel permitirá cargar el módulo firmado por mí, ya que conocerá la llave pública correspondiente.
